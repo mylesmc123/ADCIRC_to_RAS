@@ -73,5 +73,3 @@ def update_quiver(num, q, ax):
 
 ani = animation.FuncAnimation(fig, update_quiver, fargs=(q, ax), frames=range(0, len(ds["time"])), interval=50)
 ani.save('wind.mp4', writer='ffmpeg', fps=20)
-
-# %%
