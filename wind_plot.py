@@ -10,7 +10,7 @@ import matplotlib.animation as animation
 
 # %%
 # open netcdf file in to xarray dataset
-ds = xr.open_dataset("CTXCS_TP_0011_HIS_Tides_1_SLC_0_RFC_0_WAV_1_GCP_S2G03BE01_fort.74_3.nc", chunks={"node": 1000})
+ds = xr.open_dataset("windData/CTXCS_TP_0011_HIS_Tides_1_SLC_0_RFC_0_WAV_1_GCP_S2G03BE01_fort.74_5.nc", chunks={"node": 1000})
 ds
 
 # %%
@@ -73,3 +73,4 @@ def update_quiver(num, q, ax):
 
 ani = animation.FuncAnimation(fig, update_quiver, fargs=(q, ax), frames=range(0, len(ds["time"])), interval=50)
 ani.save('wind.mp4', writer='ffmpeg', fps=20)
+# %%
