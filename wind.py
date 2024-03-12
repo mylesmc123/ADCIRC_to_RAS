@@ -10,7 +10,7 @@ import matplotlib.animation as animation
 
 # %%
 # open netcdf file in to xarray dataset
-ds = xr.open_dataset("windData/CTXCS_TP_0011_HIS_Tides_1_SLC_0_RFC_0_WAV_1_GCP_S2G03BE01_fort.74_4.nc", chunks={"node": 1000})
+ds = xr.open_dataset("windData/CTXCS_TP_0011_HIS_Tides_1_SLC_0_RFC_0_WAV_1_GCP_S2G03BE01_fort.74.nc", chunks={"node": 1000})
 ds
 
 # %%
