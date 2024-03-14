@@ -6,9 +6,16 @@ import glob
 # Rain data: V:\projects\p00659_dec_glo_phase3\00_collection\Precip\Harvey
 # Data directory contains netCDF files each file representing 1 hour of precip.
 # Open each file an append to a single xarray dataset.
-data_dir = '/mnt/v/projects/p00659_dec_glo_phase3/00_collection/Precip/Harvey'
+
+# GLO Harvey data_dir
+# data_dir = '/mnt/v/projects/p00659_dec_glo_phase3/00_collection/Precip/Harvey'
+
+# LWI Laura data_dir
+data_dir = '/mnt/v/projects/p00832_ocd_2023_latz_hr/01_processing/Precipitation_AORC/nc_files/AORC_APCP_4KM_LMRFC_202008-09'
+
 # get a list of all the netcdf files in the data directory using glob.
 files = glob.glob(data_dir + '/*.nc4')
+files.sort()
 files
 
 # %%
@@ -19,18 +26,48 @@ for f in files[1:]:
     ds = xr.concat([ds, xr.open_dataset(f)], dim='time')
 
 ds
-
+# %%
+# get first and last time
+ds['time'].isel(time=0).values, ds['time'].isel(time=-1).values
 # %%
 # plot the rainfall for the 100th time step
 import matplotlib.pyplot as plt
 ds['APCP_surface'].isel(time=100).plot()
 
 # %%
+# For Laura, this AORC data starts at 2020-08-01 00:00:00 and ends at 2020-09-30 23:00:00 and has a 1Hour interval.
+# The Laura Wind data starts at 2020-08-18 00:20:00 and ends at 2020-09-10 00:00:00 and has a 20Minute interval.
+# Subset Laura Precip data to match the time range of the wind data.
+ds = ds.sel(time=slice('2020-08-18 00:00:00', '2020-09-10 00:00:00'))
+# get first and last time
+ds['time'].isel(time=0).values, ds['time'].isel(time=-1).values
+# %%
+# The frame rate of the rain should equal to: [the wind framerate * (interval wind/interval rain)] => 21fps * .3hr/1hr = 7fps
+fps = 7
+#%%
+# GLO
+# map_coords={"llcrnrlat":28,
+#             "urcrnrlat":30.5,
+#             "llcrnrlon":96.33,
+#             "urcrnrlon":-92.5}
+# LWI
+map_coords={"llcrnrlat":28,
+            "urcrnrlat":33.5,
+            "llcrnrlon":-95.5,
+            "urcrnrlon":-87}
+
+# %%
 # clip the diemnsion of latitude and longitude to the GLO bounds: lat [28,30.5], lon[-96.33,-92.5].
-min_lon = -96.33 
+# min_lon = -96.33 
+# min_lat = 28 
+# max_lon = -92.5
+# max_lat = 30.5
+
+# clip the diemnsion of latitude and longitude to the LWI bounds: lat [28,30.5], lon[-96.33,-92.5].
+min_lon = -95.5
 min_lat = 28 
-max_lon = -92.5
-max_lat = 30.5
+max_lon = -87
+max_lat = 33.5
 ds = ds.where((ds['longitude'] > min_lon) & (ds['longitude'] < max_lon) & (ds['latitude'] > min_lat) & (ds['latitude'] < max_lat), drop=True)
 ds['APCP_surface'].isel(time=200).plot()
 
@@ -44,8 +81,8 @@ import matplotlib
 lon,lat = np.meshgrid(ds["longitude"],ds["latitude"], sparse=False)
 
 
-m = Basemap(projection='merc',llcrnrlat=28,urcrnrlat=30.7,\
-          llcrnrlon=-96.33,urcrnrlon=-92.5,lat_ts=10,resolution='i')
+m = Basemap(projection='merc',llcrnrlat=map_coords["llcrnrlat"],urcrnrlat=map_coords["urcrnrlat"],\
+          llcrnrlon=map_coords["llcrnrlon"],urcrnrlon=map_coords["urcrnrlon"],lat_ts=10,resolution='i')
 lons, lats = m(lon,lat)
 
 # %%
@@ -74,8 +111,8 @@ plt.rcParams["figure.autolayout"] = True
 fig, ax = plt.subplots()
 lon,lat = np.meshgrid(ds["longitude"],ds["latitude"], sparse=False)
 # cax = ax.pcolormesh(lon, lat, color, cmap=matplotlib.cm.CMRmap, alpha=0.5)
-m = Basemap(projection='merc',llcrnrlat=28,urcrnrlat=31.5,\
-          llcrnrlon=-96.33,urcrnrlon=-92.5,lat_ts=10,resolution='i')
+m = Basemap(projection='merc',llcrnrlat=map_coords["llcrnrlat"],urcrnrlat=map_coords["urcrnrlat"],\
+          llcrnrlon=map_coords["llcrnrlon"],urcrnrlon=map_coords["urcrnrlon"],lat_ts=10,resolution='i')
 lons, lats = m(lon,lat)
 m.fillcontinents(color='#cc9955', zorder = 0)
 cax = m.pcolormesh(lons, lats, color, cmap=matplotlib.cm.CMRmap, alpha=0.5)
@@ -94,6 +131,6 @@ def animate(i):
     fig.suptitle(f'Precipitation (mm) {t}')
 
 anim = animation.FuncAnimation(fig, animate, interval=50, frames=range(0, len(ds["time"])))
-anim.save('rain.mp4', writer='ffmpeg', fps=10)
+anim.save('rain_laura.mp4', writer='ffmpeg', fps=fps)
 plt.show()
 # %%

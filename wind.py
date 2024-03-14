@@ -10,8 +10,20 @@ import matplotlib.animation as animation
 
 # %%
 # open netcdf file in to xarray dataset
-ds = xr.open_dataset("windData/CTXCS_TP_0011_HIS_Tides_1_SLC_0_RFC_0_WAV_1_GCP_S2G03BE01_fort.74.nc", chunks={"node": 1000})
+ds = xr.open_dataset("/mnt/v/projects/p00832_ocd_2023_latz_hr/01_processing/ADCIRC2RAS/Laura/ras_wind_laura_refTime_20200731_0000.nc", chunks={"node": 1000})
 ds
+
+# %%
+# GLO
+# map_coords={"llcrnrlat":28,
+#             "urcrnrlat":30.5,
+#             "llcrnrlon":96.33,
+#             "urcrnrlon":-92.5}
+# LWI
+map_coords={"llcrnrlat":28,
+            "urcrnrlat":33.5,
+            "llcrnrlon":-95.5,
+            "urcrnrlon":-87}
 
 # %%
 # compute the wind speed from the wind_u and wind_v variables.
@@ -21,8 +33,8 @@ ds["windspeed"] = np.sqrt(ds["wind_u"]**2 + ds["wind_v"]**2)
 lon,lat = np.meshgrid(ds["lon"],ds["lat"], sparse=False)
 
 
-m = Basemap(projection='merc',llcrnrlat=28,urcrnrlat=30.5,\
-          llcrnrlon=-96.33,urcrnrlon=-92.5,lat_ts=10,resolution='i')
+m = Basemap(projection='merc',llcrnrlat=map_coords["llcrnrlat"],urcrnrlat=map_coords["urcrnrlat"],\
+          llcrnrlon=map_coords["llcrnrlon"],urcrnrlon=map_coords["urcrnrlon"],lat_ts=10,resolution='i')
 lons, lats = m(lon,lat)
 
 # %%
@@ -72,5 +84,5 @@ def update_quiver(num, q, ax):
     return q,
 
 ani = animation.FuncAnimation(fig, update_quiver, fargs=(q, ax), frames=range(0, len(ds["time"])), interval=50)
-ani.save('wind.mp4', writer='ffmpeg', fps=20)
+ani.save('wind_laura_215.mp4', writer='ffmpeg', fps=21)
 # %%
