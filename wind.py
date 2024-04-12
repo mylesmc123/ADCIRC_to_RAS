@@ -9,6 +9,9 @@ from mpl_toolkits.basemap import Basemap
 import matplotlib.animation as animation
 
 # %%
+output_file = 'wind_laura_215.mp4'
+
+# %%
 # open netcdf file in to xarray dataset
 ds = xr.open_dataset("/mnt/v/projects/p00832_ocd_2023_latz_hr/01_processing/ADCIRC2RAS/Laura/ras_wind_laura_refTime_20200731_0000.nc", chunks={"node": 1000})
 ds
@@ -84,5 +87,5 @@ def update_quiver(num, q, ax):
     return q,
 
 ani = animation.FuncAnimation(fig, update_quiver, fargs=(q, ax), frames=range(0, len(ds["time"])), interval=50)
-ani.save('wind_laura_215.mp4', writer='ffmpeg', fps=21)
+ani.save(output_file, writer='ffmpeg', fps=21)
 # %%

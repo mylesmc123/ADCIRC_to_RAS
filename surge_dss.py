@@ -98,7 +98,7 @@ plt.show()
 anim.save('surge_laura.mp4', writer='ffmpeg', fps=fps)
 
 # %%
-# Using coordinated from DS boundary csv: V:\projects\p00832_ocd_2023_latz_hr\01_processing\GIS\Coastal_Segments
+# Using coordinates from DS boundary csv: V:\projects\p00832_ocd_2023_latz_hr\01_processing\GIS\Coastal_Segments
 # Plot point 201 representing this position
 x,y = -93.5044479397585,29.7656381397321
 map = folium.Map(location=[30, -95], tiles="CartoDB Positron", zoom_start=8)
@@ -106,3 +106,5 @@ map = folium.Map(location=[30, -95], tiles="CartoDB Positron", zoom_start=8)
 folium.Marker([y, x], popup='Segment 79', color="red").add_to(map)
 map
 # %%
+# save map to html
+map.save('Laura Segment 79.html')
